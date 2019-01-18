@@ -1,7 +1,7 @@
 # Street Ferret
 Last-mile intelligence.
 
-Check the [slides](#https://docs.google.com/presentation/d/18LPw-SW8qJNuNjT2F3QfWp9YstwNbiO7OuN-6nQ0AMo/edit?usp=sharing) out.
+Check the [slides](https://docs.google.com/presentation/d/18LPw-SW8qJNuNjT2F3QfWp9YstwNbiO7OuN-6nQ0AMo/edit?usp=sharing) out.
 
 <hr/>
 
@@ -33,7 +33,7 @@ _Flask_ for creating a dashboard
 
 ## Dataset
 
-[Alta Run Systems](#https://github.com/BetaNYC/Bike-Share-Data-Best-Practices/wiki/Bike-Share-Data-Systems) 
+[Alta Run Systems](https://github.com/BetaNYC/Bike-Share-Data-Best-Practices/wiki/Bike-Share-Data-Systems) 
 
 ## Engineering challenges
 
