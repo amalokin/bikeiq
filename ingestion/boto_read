@@ -1,0 +1,111 @@
+import boto3
+from sqlalchemy import create_engine
+import psycopg2
+import io
+import pandas as pd
+import s3fs
+
+
+def get_matching_s3_objects(bucket, prefix='', suffix=''):
+    """
+    Generate objects in an S3 bucket.
+
+    :param bucket: Name of the S3 bucket.
+    :param prefix: Only fetch objects whose key starts with
+        this prefix (optional).
+    :param suffix: Only fetch objects whose keys end with
+        this suffix (optional).
+    """
+    s3 = boto3.client('s3')
+    kwargs = {'Bucket': bucket}
+
+    # If the prefix is a single string (not a tuple of strings), we can
+    # do the filtering directly in the S3 API.
+    if isinstance(prefix, str):
+        kwargs['Prefix'] = prefix
+
+    while True:
+
+        # The S3 API response is a large blob of metadata.
+        # 'Contents' contains information about the listed objects.
+        resp = s3.list_objects_v2(**kwargs)
+
+        try:
+            contents = resp['Contents']
+        except KeyError:
+            return
+
+        for obj in contents:
+            key = obj['Key']
+            if key.startswith(prefix) and key.endswith(suffix):
+                yield obj
+
+        # The S3 API is paginated, returning up to 1000 keys at a time.
+        # Pass the continuation token into the next response, until we
+        # reach the final page (when this field is missing).
+        try:
+            kwargs['ContinuationToken'] = resp['NextContinuationToken']
+        except KeyError:
+            break
+
+def get_matching_s3_keys(bucket, prefix='', suffix=''):
+    """
+    Generate the keys in an S3 bucket.
+
+    :param bucket: Name of the S3 bucket.
+    :param prefix: Only fetch keys that start with this prefix (optional).
+    :param suffix: Only fetch keys that end with this suffix (optional).
+    """
+    for obj in get_matching_s3_objects(bucket, prefix, suffix):
+        yield obj['Key']
+
+s3_bucket = "s3://sharedbikedata/"
+s3 = boto3.client('s3')
+
+
+engine = create_engine('postgresql+psycopg2://postgres:berkeley@localhost/trips')
+conn = engine.raw_connection()
+cur = conn.cursor()
+output = io.StringIO()
+
+
+
+
+for key in get_matching_s3_keys(bucket='sharedbikedata', prefix='SanFrancisco/', suffix=('.zip', '.csv')):
+    print(key)
+    s3_path = [s3_bucket, key]
+    df = pd.read_csv("".join(s3_path)) #get dataset from s3 to pd.df
+    df.insert(0, "trip_id", "")
+    if "bike_share_for_all_trip" not in df:
+        df["bike_share_for_all_trip"] = ""
+
+    #df.head(0).to_sql('sf2', engine, if_exists='replace', index=False) #create schema
+    df.to_csv(output, sep='\t', header=False, index=True)
+    output.seek(0)
+    #contents = output.getvalue()
+    cur.copy_from(output, 'sf_schema', null="") # null values become ''
+    conn.commit()
+
+conn.close()
+
+#
+#
+# print(df.head(0))
+
+
+#client = boto3.client('s3') #low-level functional API
+
+# resource = boto3.resource('s3') #high-level object-oriented API
+# my_bucket = resource.Bucket('sharedbikedata') #subsitute this for your s3 bucket name.
+# files = list(my_bucket.objects.filter(Prefix='SanFrancisco/'))
+# #print(files)
+# obj = files[2].get()
+# df = pd.read_csv(io.BytesIO(obj['Body'].read()))
+# #df = pd.read_csv(obj['Body'])
+#
+#
+#
+
+
+#
+
