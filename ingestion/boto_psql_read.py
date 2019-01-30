@@ -76,7 +76,7 @@ cur = conn.cursor()
 def load_city(prefix):
     commands = (
         """
-        COPY sf_schema (city,
+        COPY trips (city,
                         duration_sec,
                         start_time,
                         end_time,
@@ -86,13 +86,13 @@ def load_city(prefix):
                         start_location_longitude,
                         end_station_id,
                         end_station_name,
-                        end_location_latitutde,
+                        end_location_latitude,
                         end_location_longitude,
                         bike_id,
                         user_type,
                         member_birth_year,
                         member_gender) 
-        FROM '/home/ubuntu/street_ferret/data/temp.csv' DELIMITER ',' CSV HEADER;
+        FROM '/tmp/city_trip_data.csv' DELIMITER ',' CSV HEADER;
         """,
     )
 
@@ -102,7 +102,7 @@ def load_city(prefix):
         s3_path = [s3_bucket, key]
         df = pd.read_csv("".join(s3_path))  # get dataset from s3 to pd.df
         df.columns = df.columns.str.strip().str.lower().str.replace(' ', '_').str.replace('(', '').str.replace(')', '')
-        print(df.columns)
+        #print(df.columns)
 
         df.insert(loc=0, column='city', value=city_lookup[prefix])
         if "bike_share_for_all_trip" in df:
@@ -133,7 +133,7 @@ def load_city(prefix):
 
 
 
-        df.to_csv("/home/ubuntu/street_ferret/data/temp.csv", index=False)
+        df.to_csv("/tmp/city_trip_data.csv", index=False)
 
         for command in commands:
             cur.execute(command)
@@ -141,7 +141,7 @@ def load_city(prefix):
     conn.commit()
     conn.close()
 
-#load_city("SanFrancisco/")
+load_city("SanFrancisco/")
 #load_city("NewYork/")
 #load_city("Boston/")
 

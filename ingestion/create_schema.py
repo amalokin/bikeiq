@@ -6,7 +6,7 @@ def create_tables():
     """ create tables in the PostgreSQL database"""
     commands = (
         """
-        CREATE TABLE IF NOT EXISTS sf_schema (
+        CREATE TABLE IF NOT EXISTS trips (
             trip_id SERIAL8 PRIMARY KEY,
             city VARCHAR(16),
             duration_sec INT4,
