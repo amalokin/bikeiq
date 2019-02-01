@@ -1,11 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" autoUpload="Always" serverName="ubuntu@ec2-54-68-245-82.us-west-2.compute.amazonaws.com:22">
+  <component name="PublishConfigData" autoUpload="Always" serverName="airflow_node">
     <serverData>
-      <paths name="ubuntu@ec2-54-68-245-82.us-west-2.compute.amazonaws.com:22">
+      <paths name="airflow_node">
         <serverdata>
           <mappings>
-            <mapping deploy="/home/ubuntu/street_ferret" local="$PROJECT_DIR$" />
+            <mapping deploy="/home/ubuntu/airflow" local="$PROJECT_DIR$/airflow" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="spark_master_node">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/home/ubuntu/street_ferret/ingestion" local="$PROJECT_DIR$/ingestion" />
           </mappings>
         </serverdata>
       </paths>
