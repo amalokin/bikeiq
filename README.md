@@ -1,4 +1,4 @@
-# Street Ferret
+# BikeIQ
 Last-mile intelligence.
 
 Check the [slides](https://docs.google.com/presentation/d/18LPw-SW8qJNuNjT2F3QfWp9YstwNbiO7OuN-6nQ0AMo/edit?usp=sharing) out.
