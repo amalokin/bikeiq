@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/street_ferret.iml" filepath="$PROJECT_DIR$/.idea/street_ferret.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../bikeiq/.idea/bikeiq.iml" filepath="$PROJECT_DIR$/../bikeiq/.idea/bikeiq.iml" />
     </modules>
   </component>
 </project>

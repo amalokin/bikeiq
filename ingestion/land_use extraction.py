@@ -3,7 +3,7 @@ import zipfile
 import pandas as pd
 import numpy as np
 
-s3_path = "/home/ubuntu/street_ferret/data/Tracts_Block_Groups_Only.tar"
+s3_path = "/home/ubuntu/bikeiq/data/Tracts_Block_Groups_Only.tar"
 tar = tarfile.open(s3_path)
 
 
@@ -134,7 +134,7 @@ for key in lookup_dic2.keys():
         output = pd.merge(output, result, how="left", left_on=["FIPS"], right_on=["FIPS"])
 print(output.head())
 print(output.columns)
-output.to_csv("/home/ubuntu/street_ferret/data/acs.csv", index=False)
+output.to_csv("/home/ubuntu/bikeiq/data/acs.csv", index=False)
 # print(output[output.logrecno.isin([2947])])
 
 

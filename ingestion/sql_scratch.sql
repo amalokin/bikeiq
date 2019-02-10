@@ -93,7 +93,7 @@ CREATE TABLE IF NOT EXISTS acs (
         med_rent FLOAT8
         );
 
-COPY acs FROM '/home/ubuntu/street_ferret/data/acs.csv' DELIMITER ',' CSV HEADER;
+COPY acs FROM '/home/ubuntu/bikeiq/data/acs.csv' DELIMITER ',' CSV HEADER;
 
 ALTER TABLE acs ADD COLUMN bg_id VARCHAR(12);
 UPDATE acs SET bg_id=substring(fips, 8);
@@ -134,28 +134,7 @@ FROM (
                               countyfp = '001' OR
                               countyfp = '085')
     ) AS inputs) AS features
-) TO '/home/ubuntu/street_ferret/app/html/data/bg_polyCA.json';
-
-COPY(
-SELECT jsonb_build_object(
-    'type',     'FeatureCollection',
-    'features', jsonb_agg(features.feature)
-)
-FROM (
-  SELECT jsonb_build_object(
-    'type',       'Feature',
-    'id',         bg_id,
-    'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
-    'properties', to_jsonb(inputs) - 'bg_id' - 'the_geom'
-  ) AS feature
-  FROM (
-    SELECT *
-    FROM acs_mapped
-    WHERE statefp = '06' AND (countyfp = '075')
-    ) AS inputs) AS features
-) TO '/home/ubuntu/street_ferret/app/html/data/bg_polySF.json';
-
-
+) TO '/home/ubuntu/bikeiq/app/html/data/bg_polyCA.json';
 
 
 
@@ -218,7 +197,7 @@ COPY(
     ) AS feature
     FROM start_station_count AS inputs
   ) AS features
-) TO '/home/ubuntu/street_ferret/app/html/data/start_trip_count.json';
+) TO '/home/ubuntu/bikeiq/app/html/data/start_trip_count.json';
 
 --export end station trips
 COPY(
@@ -235,7 +214,7 @@ COPY(
     ) AS feature
     FROM end_station_count AS inputs
   ) AS features
-) TO '/home/ubuntu/street_ferret/app/html/data/end_trip_count.json';
+) TO '/home/ubuntu/bikeiq/app/html/data/end_trip_count.json';
 
 --export all station trips
 COPY(
@@ -252,4 +231,4 @@ COPY(
     ) AS feature
     FROM all_station_count AS inputs
   ) AS features
-) TO '/home/ubuntu/street_ferret/app/html/data/all_trip_count.json';
+) TO '/home/ubuntu/bikeiq/app/html/data/all_trip_count.json';

@@ -1,27 +1,42 @@
-# Street Ferret
-Last-mile intelligence.
+# BikeIQ
+####Last-mile intelligence.
 
-Check the [slides](https://docs.google.com/presentation/d/18LPw-SW8qJNuNjT2F3QfWp9YstwNbiO7OuN-6nQ0AMo/edit?usp=sharing) out.
+<hr></hr>
 
-<hr/>
+The front-end is available [here](bit.ly/bikeiq)
+
+The slides are available 
+[here](https://docs.google.com/presentation/d/1xEti1PQRY-N5e-IMhQ-9HVam_BxDPLT3lmgOQJTOY7I/edit?usp=sharing).
+
+The screencast of the front-end functionality will be available soon.
+
+
 
 ## How to install and get it up and running
 
-TBD _sh_ script contents:
-* _Postgres_ setup,
-* _Postgis_ setup.
+See the _READMEs_ and _shell_ scripts in the respective folders.
 
-<hr/>
+_AWS_ setup is not covered.
+
+Node configurations include:
+
+* _Airflow_ setup
+* _PostGIS_ setup
+* _Postgres-XL_ setup
+* _Apache2_ setup
+
 
 ## Introduction
 
 Sharing systems are galvanizing a renewed interest in bicycles, scooters, and other first/last 
 mile mobility services. At an annual growth rate of 7%, global market size is estimated to 
-reach $8 billion by 2023. To facilitate strategic planning, I’ve developed a map-based 
+reach [$8 billion by 2023](https://www.mordorintelligence.com/industry-reports/bike-sharing-market). 
+To facilitate strategic planning, I’ve developed a map-based 
 exploratory tool for data scientists and business analysts to identify promising locations 
-and new markets for the service expansion. This tool uses historical trip data, socio-economic 
-attributes, and land use characteristics, as it offers a platform of leveraging data-driven 
-insights from fusing multisource datasets.
+and new markets for the service expansion. This tool can use historical trip data, 
+socio-economic attributes, micro-climate data, land use characteristics, and other 
+spatial data, as it offers a platform of leveraging data-driven insights from fusing 
+multisource datasets.
 
 ## Architecture
 
@@ -38,48 +53,36 @@ and preprocessed using _python_. The resulting hand-picked, domain-relevant attr
 loaded into
 _PostgreSQL_ database, which is set up on an _ec2_ cluster. 
   
-_Airflow_ will run _python_ tasks to load each trip dataset into a _PostgreSQL_ database 
-to perform a spatial join (origin and destination points to polygons) with socio-economic 
-and land use attributes in parallel. The enriched trip data, then, will be piped into 
-_Cassandra_ or other NO SQL, column-wise database. _Spark_ will be used to process variables 
-efficiently, 
-e.g., to estimate basic statistics like correlation, OLS regression, etc.
+_Airflow_ node runs _python_ and _bash_ tasks to load each trip dataset into a _PostgreSQL_ database 
+with _PostGIS_ extension to perform a spatial join (origin and destination points to polygons)
+with socio-economic and land use attributes. The enriched trip data, then, will be piped into 
+_Postgres-XL_ data warehouse.
 
-_Flask_ will be used for creating a map-based dashboard to visualize pre-computed and arbitrary
+_Leaflet_ is used for creating a map-based dashboard to visualize pre-computed and arbitrary
 queries of interest that will help to identify locations for expansion within the entire U.S. 
 
-If time permits, the scope of the project may include ingesting station occupancy status 
-(provided in each city with 10 seconds resolution). _Kafka_ will be used to provide this
-functionality.
 
 
 ## Datasets
 
 Historical trip data: 
 [Alta Run Systems](https://github.com/BetaNYC/Bike-Share-Data-Best-Practices/wiki/Bike-Share-Data-Systems) 
-(~ 70Gb across the whole systems)
+(~ 70Gb across the whole system)
 
 Socio-economic data:
 [American Community Survey 2017, 5 year estimates](https://www2.census.gov/programs-surveys/acs/summary_file/2017/data/5_year_entire_sf/) 
 (~ 30Gb)
 
-Land use data:
-[EPA Smart Location Database](https://edg.epa.gov/data/PUBLIC/OP/SLD)
-(~ 1Gb)
-
 Spatial reference data:
 [TIGER  Geodatabase](https://www.census.gov/geo/maps-data/data/tiger-geodatabases.html)
-(~ 20Gb)
-
+(~ 300Gb)
 
 
 
 ## Engineering challenges
 
-* IO optimized search and retrieval of the required socio-economic data
-* Efficient handling of the spatial matching pipelines
-* Flexibility of the postprocessing
-* Architecture built to satisfy preliminary and comprehensive data analysis
+* Efficient use of spatial joins on geo-reference data 
+* Defining the requirements for a data warehouse and choosing a solution accordingly
 
 ## Trade-offs
 

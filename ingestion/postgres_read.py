@@ -21,7 +21,7 @@ def read_data():
                         user_type,
                         member_birth_year,
                         member_gender) 
-        FROM '/home/ubuntu/street_ferret/data/2017-fordgobike-tripdata.csv' DELIMITER ',' CSV HEADER;
+        FROM '/home/ubuntu/bikeiq/data/2017-fordgobike-tripdata.csv' DELIMITER ',' CSV HEADER;
         """,
     )
     conn = None

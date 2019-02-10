@@ -26,7 +26,7 @@ except botocore.exceptions.ClientError as e:
         raise
 
 
-# s3_path = "/home/ubuntu/street_ferret/data/Tracts_Block_Groups_Only.tar"
+# s3_path = "/home/ubuntu/bikeiq/data/Tracts_Block_Groups_Only.tar"
 #open the ACS tar file
 tar = tarfile.open(DESTINATION)
 
@@ -164,9 +164,9 @@ for key in lookup_dic2.keys():
         output = pd.merge(output, result, how="left", left_on=["FIPS"], right_on=["FIPS"])
 print(output.head())
 # print(output.columns)
-output.to_csv("/home/ubuntu/street_ferret/data/acs.csv", index=False)
+output.to_csv("/home/ubuntu/bikeiq/data/acs.csv", index=False)
 
-s3.Object(BUCKET_NAME, ''.join([PREFIX, OUTCSV])).put(Body=open('/home/ubuntu/street_ferret/data/acs.csv', 'rb'))
+s3.Object(BUCKET_NAME, ''.join([PREFIX, OUTCSV])).put(Body=open('/home/ubuntu/bikeiq/data/acs.csv', 'rb'))
 
 
 
