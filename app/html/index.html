@@ -1,0 +1,285 @@
+<html>
+<head>
+  <title>BikeIQ</title>
+  <link rel="stylesheet" href="./leaflet.css"/>
+  <script src="./leaflet.js"></script>
+  <script src="jquery-3.3.1.min.js"></script>
+  <style>
+    #map{ height: 88% }
+  </style>
+</head>
+<body>
+
+  <div id="map"></div>
+
+  <script>
+  
+  var map = L.map('map').setView([37.77, -122.45], 13);
+
+  // load a tile layer
+  var Hydda_Full = L.tileLayer('https://{s}.tile.openstreetmap.se/hydda/full/{z}/{x}/{y}.png', {
+	maxZoom: 18,
+	attribution: 'Tiles courtesy of <a href="http://openstreetmap.se/" target="_blank">OpenStreetMap Sweden</a> &mdash; Map data 		' +
+            '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+	});
+  Hydda_Full.addTo(map);
+
+  
+  
+  
+  
+//get the polygon layer
+
+$(document).ready(function() {
+$("#dens").click(function(event){
+$.getJSON("./data/bg_polyCA.json", function(data){
+	try {
+		map.removeLayer(geojsonLayer);
+	}
+	catch(e) {}
+  geojsonLayer = L.geoJson( data,{
+    style: function(feature){
+      var fillColor,
+          density = feature.properties.pop_tot / (feature.properties.aland / 1000000);
+      if ( density > 15000 ) fillColor = "#581845";
+      else if ( density > 12000 ) fillColor = "#900C3F";
+      else if ( density > 10000 ) fillColor = "#C70039";
+      else if ( density > 7500 ) fillColor = "#FF5733";
+      else if ( density > 5000 ) fillColor = "#FFC300";
+      else if ( density > 2500 ) fillColor = "#DAF7A6";
+      else if ( density > 1000 ) fillColor = "#F0F3BD";
+      else if ( density > 500 ) fillColor = "#02C39A";
+      else if ( density > 250 ) fillColor = "#00A896";
+	  else if ( density > 100 ) fillColor = "#028090";
+	  else if ( density > 0 ) fillColor = "#05668D";
+      else fillColor = "#f7f7f7";  // no data
+      return { color: "#999", weight: 1, fillColor: fillColor, fillOpacity: .5 };
+    },
+    onEachFeature: function(feature, layer){
+      var density = Math.round(feature.properties.pop_tot / (feature.properties.aland / 1000000));
+      layer.bindPopup( "<strong>" + feature.properties.fips + "</strong><br/>" + density)
+    }
+  }  ).addTo(map).bringToBack();
+});
+});
+});
+
+
+$(document).ready(function() {
+$("#income").click(function(event){
+$.getJSON("./data/bg_polyCA.json", function(data){
+	try {
+		map.removeLayer(geojsonLayer);
+	}
+	catch(e) {}
+  
+  geojsonLayer = L.geoJson( data,{
+    style: function(feature){
+      var fillColor,
+          density = feature.properties.med_hh_inc / 1000;
+      if ( density > 225 ) fillColor = "#581845";
+      else if ( density > 200 ) fillColor = "#900C3F";
+      else if ( density > 175 ) fillColor = "#C70039";
+      else if ( density > 150 ) fillColor = "#FF5733";
+      else if ( density > 125 ) fillColor = "#FFC300";
+      else if ( density > 100 ) fillColor = "#DAF7A6";
+      else if ( density > 75 ) fillColor = "#F0F3BD";
+      else if ( density > 50 ) fillColor = "#02C39A";
+      else if ( density > 25 ) fillColor = "#00A896";
+	  else if ( density > 10 ) fillColor = "#028090";
+	  else if ( density > 0 ) fillColor = "#05668D";
+      else fillColor = "#f7f7f7";  // no data
+      return { color: "#999", weight: 1, fillColor: fillColor, fillOpacity: .5 };
+    },
+    onEachFeature: function(feature, layer){
+      var density = Math.round(feature.properties.med_hh_inc / 1000);
+      layer.bindPopup( "<strong>" + feature.properties.fips + "</strong><br/>" + density)
+    }
+  }  ).addTo(map).bringToBack();
+});
+});
+});
+
+
+$(document).ready(function() {
+$("#r_wh").click(function(event){
+$.getJSON("./data/bg_polyCA.json", function(data){
+	try {
+		map.removeLayer(geojsonLayer);
+	}
+	catch(e) {}
+  
+  geojsonLayer = L.geoJson( data,{
+    style: function(feature){
+      var fillColor,
+          density = (feature.properties.race_white / feature.properties.pop_tot) * 100;
+      if ( density > 95 ) fillColor = "#581845";
+      else if ( density > 90 ) fillColor = "#900C3F";
+      else if ( density > 80 ) fillColor = "#C70039";
+      else if ( density > 70 ) fillColor = "#FF5733";
+      else if ( density > 60 ) fillColor = "#FFC300";
+      else if ( density > 50 ) fillColor = "#DAF7A6";
+      else if ( density > 40 ) fillColor = "#F0F3BD";
+      else if ( density > 30 ) fillColor = "#02C39A";
+      else if ( density > 20 ) fillColor = "#00A896";
+	  else if ( density > 10 ) fillColor = "#028090";
+	  else if ( density > 0 ) fillColor = "#05668D";
+      else fillColor = "#f7f7f7";  // no data
+      return { color: "#999", weight: 1, fillColor: fillColor, fillOpacity: .5 };
+    },
+    onEachFeature: function(feature, layer){
+      var density = Math.round((feature.properties.race_white / feature.properties.pop_tot) * 100);
+      layer.bindPopup( "<strong>" + feature.properties.fips + "</strong><br/>" + density)
+    }
+  }  ).addTo(map).bringToBack();
+});
+});
+});
+
+
+$(document).ready(function() {
+$("#r_as").click(function(event){
+$.getJSON("./data/bg_polyCA.json", function(data){
+	try {
+		map.removeLayer(geojsonLayer);
+	}
+	catch(e) {}
+  
+  geojsonLayer = L.geoJson( data,{
+    style: function(feature){
+      var fillColor,
+          density = (feature.properties.asian / feature.properties.pop_tot) * 100;
+      if ( density > 95 ) fillColor = "#581845";
+      else if ( density > 90 ) fillColor = "#900C3F";
+      else if ( density > 80 ) fillColor = "#C70039";
+      else if ( density > 70 ) fillColor = "#FF5733";
+      else if ( density > 60 ) fillColor = "#FFC300";
+      else if ( density > 50 ) fillColor = "#DAF7A6";
+      else if ( density > 40 ) fillColor = "#F0F3BD";
+      else if ( density > 30 ) fillColor = "#02C39A";
+      else if ( density > 20 ) fillColor = "#00A896";
+	  else if ( density > 10 ) fillColor = "#028090";
+	  else if ( density > 0 ) fillColor = "#05668D";
+      else fillColor = "#f7f7f7";  // no data
+      return { color: "#999", weight: 1, fillColor: fillColor, fillOpacity: .5 };
+    },
+    onEachFeature: function(feature, layer){
+      var density = Math.round((feature.properties.asian / feature.properties.pop_tot) * 100);
+      layer.bindPopup( "<strong>" + feature.properties.fips + "</strong><br/>" + density)
+    }
+  }  ).addTo(map).bringToBack();
+});
+});
+});
+
+
+
+$(document).ready(function() {
+$("#tu10").click(function(event){
+$.getJSON("./data/bg_polyCA.json", function(data){
+	try {
+		map.removeLayer(geojsonLayer);
+	}
+	catch(e) {}
+  
+  geojsonLayer = L.geoJson( data,{
+    style: function(feature){
+      var fillColor,
+          density = (feature.properties.trips_u10 / feature.properties.tot_trips) * 100;
+      if ( density > 95 ) fillColor = "#581845";
+      else if ( density > 90 ) fillColor = "#900C3F";
+      else if ( density > 80 ) fillColor = "#C70039";
+      else if ( density > 70 ) fillColor = "#FF5733";
+      else if ( density > 60 ) fillColor = "#FFC300";
+      else if ( density > 50 ) fillColor = "#DAF7A6";
+      else if ( density > 40 ) fillColor = "#F0F3BD";
+      else if ( density > 30 ) fillColor = "#02C39A";
+      else if ( density > 20 ) fillColor = "#00A896";
+	  else if ( density > 10 ) fillColor = "#028090";
+	  else if ( density > 0 ) fillColor = "#05668D";
+      else fillColor = "#f7f7f7";  // no data
+      return { color: "#999", weight: 1, fillColor: fillColor, fillOpacity: .5 };
+    },
+    onEachFeature: function(feature, layer){
+      var density = Math.round((feature.properties.trips_u10 / feature.properties.tot_trips) * 100);
+      layer.bindPopup( "<strong>" + feature.properties.fips + "</strong><br/>" + density)
+    }
+  }  ).addTo(map).bringToBack();
+});
+});
+});
+
+
+$(document).ready(function() {
+$("#tu19").click(function(event){
+$.getJSON("./data/bg_polyCA.json", function(data){
+	try {
+		map.removeLayer(geojsonLayer);
+	}
+	catch(e) {}
+  
+  geojsonLayer = L.geoJson( data,{
+    style: function(feature){
+      var fillColor,
+          density = ((feature.properties.trips_u10 + feature.properties.trips_1014 + feature.properties.trips_1519) / feature.properties.tot_trips) * 100;
+      if ( density > 95 ) fillColor = "#581845";
+      else if ( density > 90 ) fillColor = "#900C3F";
+      else if ( density > 80 ) fillColor = "#C70039";
+      else if ( density > 70 ) fillColor = "#FF5733";
+      else if ( density > 60 ) fillColor = "#FFC300";
+      else if ( density > 50 ) fillColor = "#DAF7A6";
+      else if ( density > 40 ) fillColor = "#F0F3BD";
+      else if ( density > 30 ) fillColor = "#02C39A";
+      else if ( density > 20 ) fillColor = "#00A896";
+	  else if ( density > 10 ) fillColor = "#028090";
+	  else if ( density > 0 ) fillColor = "#05668D";
+      else fillColor = "#f7f7f7";  // no data
+      return { color: "#999", weight: 1, fillColor: fillColor, fillOpacity: .5 };
+    },
+    onEachFeature: function(feature, layer){
+      var density = Math.round(((feature.properties.trips_u10 +	feature.properties.trips_1014 +	feature.properties.trips_1519) / feature.properties.tot_trips) * 100);
+      layer.bindPopup( "<strong>" + feature.properties.fips + "</strong><br/>" + density)
+    }
+  }  ).addTo(map).bringToBack();
+});
+});
+});
+
+
+
+//get the station layer
+$.getJSON("./data/all_trip_count.json",function(data){
+  L.geoJson(data, {
+    pointToLayer: function (feature, latlng) {
+      var marker = L.circle(latlng,{
+        color: 'black',
+        radius: Math.sqrt(feature.properties.cnt) / 3
+      });
+      return marker;
+    },
+    onEachFeature: function(feature, layer){
+      layer.bindPopup( "<strong>" + feature.properties.station_name + "</strong><br/>" +
+                        "Trips: "+ feature.properties.cnt)
+    }
+  }).addTo(map).bringToFront();
+});
+
+  </script>
+
+<fieldset>
+  <legend>Map controls</legend>
+  <input type = "button" id = "dens" value = "Population density, p/km^2" />
+  <input type = "button" id = "income" value = "HH income, $k" />
+  <input type = "button" id = "r_wh" value = "Share of Whites, %" />
+  <input type = "button" id = "r_as" value = "Share of Asians, %" />
+  <input type = "button" id = "tu10" value = "Commutes under 10 mins, %" />
+  <input type = "button" id = "tu19" value = "Commutes under 19 mins, %" />
+  
+</fieldset>
+
+<script>
+
+</script>
+  
+</body>
+</html>
