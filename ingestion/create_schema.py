@@ -3,7 +3,7 @@ from config_psql import config
 
 
 def create_tables():
-    """ create tables in the PostgreSQL database"""
+    """ create tables in the PostGIS database"""
     commands = (
         """
         CREATE TABLE IF NOT EXISTS trips (

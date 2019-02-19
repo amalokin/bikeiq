@@ -1,4 +1,4 @@
-##Front-end setup
+## Front-end setup
 
 On a ec2 instance install _Apache2_:
 

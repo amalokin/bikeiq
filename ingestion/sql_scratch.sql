@@ -1,3 +1,5 @@
+--various postgres commands
+
 --men take shorter trips that women:
 select avg(duration_sec)/60 as duration_min, member_gender from trip_data group by member_gender order by duration_min;
 
@@ -12,11 +14,11 @@ update tiger.loader_platform set declare_sect=
 where os='debbie';
 
 update tiger.loader_platform set declare_sect=
-(select replace ((select declare_sect from tiger.loader_platform where os='debbie'),'9.4','9.5'))
+(select replace ((select declare_sect from tiger.loader_platform where os='debbie'),'10','11'))
 where os='debbie';
 
 update tiger.loader_platform set declare_sect=
-(select replace ((select declare_sect from tiger.loader_platform where os='debbie'),'${PGBIN}/shp2pgsql','/usr/bin/shp2pgsql'))
+(select replace ((select declare_sect from tiger.loader_platform where os='debbie'),'shp2pgsql','/usr/bin/shp2pgsql'))
 where os='debbie';
 
 

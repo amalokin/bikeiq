@@ -10,6 +10,14 @@
           <option name="port" value="22" />
         </fileTransfer>
       </webServer>
+      <webServer id="fd4ea876-2c0d-4f43-9e8a-8b46be356279" name="app_node" url="http://ec2-35-164-67-190.us-west-2.compute.amazonaws.com">
+        <fileTransfer host="ec2-35-164-67-190.us-west-2.compute.amazonaws.com" port="22" accessType="SFTP" authAgent="true">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+          <option name="port" value="22" />
+        </fileTransfer>
+      </webServer>
     </option>
   </component>
 </project>

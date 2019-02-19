@@ -1,12 +1,12 @@
 # BikeIQ
-###Last-mile intelligence.
+#### Last-mile intelligence.
 
 <hr></hr>
 
 The front-end is available [here](https://bit.ly/bikeiq)
 
 The slides are available 
-[here](https://docs.google.com/presentation/d/1xEti1PQRY-N5e-IMhQ-9HVam_BxDPLT3lmgOQJTOY7I/edit?usp=sharing).
+[here](https://bit.ly/slides_bikeiq).
 
 The screencast of the front-end functionality will be available soon.
 

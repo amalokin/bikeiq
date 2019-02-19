@@ -9,6 +9,13 @@
           </mappings>
         </serverdata>
       </paths>
+      <paths name="app_node">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/var/www/html" local="$PROJECT_DIR$/app/html" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
       <paths name="spark_master_node">
         <serverdata>
           <mappings>
