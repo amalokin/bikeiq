@@ -6,6 +6,8 @@ from airflow.hooks import PostgresHook
 from airflow.contrib.operators.ssh_operator import SSHOperator
 
 
+
+
 #arguments for the dag
 args = {
     "owner": "airflow",
