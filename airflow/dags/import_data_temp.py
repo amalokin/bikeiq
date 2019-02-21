@@ -8,7 +8,8 @@ from airflow.contrib.operators.ssh_operator import SSHOperator
 import boto3
 import psycopg2
 import pandas as pd
-from config_psql import config
+from scripts.config_psql import config
+import os
 
 
 
@@ -34,7 +35,7 @@ args = {
 def create_import_table(**kwargs):
     conn_id = kwargs.get('conn_id')
     pg_hook = PostgresHook(conn_id)
-    sql = """
+    commands = ("""
         CREATE TABLE IF NOT EXISTS trips (
             trip_id SERIAL8 PRIMARY KEY,
             city VARCHAR(16),
@@ -54,8 +55,44 @@ def create_import_table(**kwargs):
             member_birth_year FLOAT4,
             member_gender VARCHAR(16)
             );
+        """,
         """
-    pg_hook.run(sql)
+        CREATE TABLE IF NOT EXISTS acs (
+        fips VARCHAR(19) PRIMARY KEY,
+        bach_edu FLOAT8,
+        tot_trips FLOAT8,
+        trips_u10 FLOAT8,
+        trips_1014 FLOAT8,
+        trips_1519 FLOAT8,
+        med_age FLOAT8,
+        med_age_m FLOAT8,
+        med_age_f FLOAT8,
+        pop_tot FLOAT8,
+        race_white FLOAT8,
+        race_black FLOAT8,
+        asian FLOAT8,
+        smartphone FLOAT8,
+        car FLOAT8,
+        transit FLOAT8,
+        bike FLOAT8,
+        walk FLOAT8,
+        male_tot FLOAT8,
+        fmale_tot FLOAT8,
+        units_tot FLOAT8,
+        owned FLOAT8,
+        rented FLOAT8,
+        med_hh_inc FLOAT8,
+        med_rent FLOAT8
+        );
+
+        COPY acs FROM '/home/ubuntu/bikeiq/data/acs.csv' DELIMITER ',' CSV HEADER;
+        
+        ALTER TABLE acs ADD COLUMN bg_id VARCHAR(12);
+        UPDATE acs SET bg_id=substring(fips, 8);
+        """
+        )
+    for command in commands:
+        pg_hook.run(command)
 
 
 def ETL_run(**kwargs):
@@ -146,8 +183,35 @@ def ETL_run(**kwargs):
                             member_gender) 
             FROM '/tmp/city_trip_data.csv' DELIMITER ',' CSV HEADER;
             """,
+            """
+            ALTER TABLE trips ADD COLUMN start_station_point geometry(Point, 4269);
+            ALTER TABLE trips ADD COLUMN end_station_point geometry(Point, 4269);
+            UPDATE trips SET start_station_point=st_SetSrid(st_MakePoint(start_location_longitude, start_location_latitude), 4269);
+            UPDATE trips SET end_station_point=st_SetSrid(st_MakePoint(end_location_longitude, end_location_latitude), 4269);
+            """,
+            """
+            ALTER TABLE trips ADD COLUMN start_fips VARCHAR(12);
+            ALTER TABLE trips ADD COLUMN end_fips VARCHAR(12);
+
+            UPDATE trips SET start_fips=fips.bg_id
+            FROM
+            (SELECT trips.trip_id, bg.bg_id
+            FROM trips, bg
+            WHERE ST_Contains(bg.the_geom,trips.start_station_point)
+            ) AS fips
+            WHERE trips.trip_id = fips.trip_id;
+            
+            UPDATE trips SET end_fips=fips.bg_id
+            FROM
+            (SELECT trips.trip_id, bg.bg_id
+            FROM trips, bg
+            WHERE ST_Contains(bg.the_geom,trips.end_station_point)
+            ) AS fips
+            WHERE trips.trip_id = fips.trip_id;
+            """
         )
 
+        #iterate over files (time, city)
         for key in get_matching_s3_keys(bucket='sharedbikedata', prefix=prefix, suffix=('.zip', '.csv')):
             print(key)
             s3_path = [s3_bucket, key]
@@ -167,7 +231,9 @@ def ETL_run(**kwargs):
                 df.end_station_latitude = pd.to_numeric(df.end_station_latitude, errors='coerce')
                 df.end_station_longitude = pd.to_numeric(df.end_station_longitude, errors='coerce')
 
+            #streaming at the remote server will improve IO and network cost
             df.to_csv("/tmp/city_trip_data.csv", index=False)
+            os.system("scp /tmp/city_trip_data.csv ubuntu@10.0.0.4:/tmp/")
 
             for command in commands:
                 pg_hook.run(command)
@@ -175,22 +241,22 @@ def ETL_run(**kwargs):
             break
 
 
-    load_city("SanFrancisco/")
+    load_city(prefix="SanFrancisco/")
 
 
 
-def create_tres(**kwargs):
-    conn_id = kwargs.get('conn_id')
-    pg_hook = PostgresHook(conn_id)
-    sql = """CREATE TABLE IF NOT EXISTS tres (id_id INT8 PRIMARY KEY) DISTRIBUTE BY HASH(id_id);"""
-    pg_hook.run(sql)
+# def create_tres(**kwargs):
+#     conn_id = kwargs.get('conn_id')
+#     pg_hook = PostgresHook(conn_id)
+#     sql = """CREATE TABLE IF NOT EXISTS tres (id_id INT8 PRIMARY KEY) DISTRIBUTE BY HASH(id_id);"""
+#     pg_hook.run(sql)
 
 
 
 
 ####DAG definition
 dag = DAG(
-    'import_data',
+    'import_data_temp',
     schedule_interval='@once',
     default_args=args)
 
@@ -206,11 +272,11 @@ ETL_run_op = PythonOperator(
     python_callable=ETL_run,
     dag=dag)
 
-create_tres_op = PythonOperator(
-    task_id='create_tres',
-    op_kwargs = {'conn_id':'pgxl_coord1'},
-    python_callable=create_tres,
-    dag=dag)
+# create_tres_op = PythonOperator(
+#     task_id='create_tres',
+#     op_kwargs = {'conn_id':'pgxl_coord1'},
+#     python_callable=create_tres,
+#     dag=dag)
 
 #get s3 read into the local node
 create_gisdata_op = SSHOperator(
@@ -225,5 +291,5 @@ create_gisdata_op = SSHOperator(
 
 
 
-create_import_table_op >> ETL_run_op >> create_tres_op
-create_gisdata_op >> create_tres_op
+create_import_table_op >> ETL_run_op
+create_gisdata_op >> ETL_run_op
